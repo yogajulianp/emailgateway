@@ -1,0 +1,11 @@
+//BE jobdesk
+[0] authorized -> Yoga
+[1] dashboard -> Y
+[2] sendMail  -> Yoga prioritas- {
+                    Schedule email , send email dengan kategory company
+[3] company  -> Saefudin
+[4] contact  -> Eswin {
+        relasi : buat table companynya diisi random dulu.,dumny data diinsert 
+        ke database dulu
+    }
+[5] import excel -> Addyani

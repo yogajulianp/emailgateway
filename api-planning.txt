@@ -42,15 +42,15 @@ before:
 
 
 revisi:
-[1] home login
+[1] home login -> yoga follow up
 {root.api}/{subdomain}/{version}/
 
-res:
+res: 
 {
     title: "home login",
     url: " https://login.microsoftonline.com/common/oauth2/v2.0/authorize+....   "
 }
-
+codeStatusResponse : 200 OK
 
 
 [2] - login authorize with microsoft acount
@@ -65,6 +65,8 @@ res:
 {
     "Retrieved auth code in /authorize: " + code
 }
+codeStatusResponse : 200 OK
+
 if success
 redirect : {root.api}/{subdomain}/{version}/dashboard
 
@@ -72,13 +74,11 @@ if fail:
 err-response : 400-input yang dimasukkan tidak valid
 redirect : {root.api}/{subdomain}/{version}/
 
-[3] - 
 
-[4] -
-
-[5] - logout 
+[3] - logout 
 {root.api}/{subdomain}/{version}/logout
 res: 
+codeStatusResponse : 200 OK
 {root.api}/{subdomain}/{version}/
 
 
@@ -87,34 +87,32 @@ before
 [1] mailbox 
 {root.api}/home
 
+
 revisi : 
 [1] dashboard
 {root.api}/{subdomain}/{version}/dashboard
-req: {
-    username,
-    mailbox_history: {
-        bodyEmail - status send
-    }
-    mailbox_contact: {
-        name,
-        company,
-        emailAddress
-    }
+res : 
+{
+    username: username,
+    mailboxHistory: [
+        {
+            email: email,
+            status: status
+        }     
+    ],
+    mailboxContact: [
+        {
+            name: contact.name,
+            company: company.name,
+            emailAddress: contact.email
+        }
+    ]
 }
+codeStatusResponse : 200 OK
 
-res : {
-    username,
-    mailbox_history: {
-        bodyEmail - status send
-    }
-    mailbox_contact: {
-        name,
-        company,
-        emailAddress
-    }
-}
-
+if fail:
 err response : 404 - NOT FOUND
+
 
 [2] Send Email 
 {root.api}/{subdomain}/{version}/send-email
@@ -122,45 +120,62 @@ err response : 404 - NOT FOUND
 Button send-email
 req:{
     to: {
-        contact.email,
-        company_category : {
-            email1,
-            email2,
-            email2,
-        }
+        individualEmail: contact.email,
+        groupEmail : [
+            email1: contact.email,
+            email2: contact.email,
+            email2: contact.email
+        ]
     },
     cc: {
-        contact.email,
-        company_category : {
-            email1,
-            email2,
-            email2,
-        }
+        individualEmail: contact.email,
+        groupEmail : [
+            email1: contact.email,
+            email2: contact.email,
+            email2: contact.email
+        ]
     },
     Subject: ".. ",
     Body: "text",
     Schedule: {
-        date = "yyyy-MM-dd", 
-        time = "HH:mm:ss"    
+        date : "yyyy-MM-dd", 
+        time : "HH:mm:ss"    
     }
 }
 res: {
-    ("{root.api}/{subdomain}/{version}/dashboard",
+    redirect: "{root.api}/{subdomain}/{version}/dashboard",
     { 
         msg: "Email sent",
         info: info.response,
     }),
-
 }
+codeStatusResponse : 200 OK
+
+if fail:
 err.response : 500 error.message
 
-[2] company
+[3] company
 {root.api}/{subdomain}/{version}/company/
 
 req: {
-    name: " ",
-    address: " "
+    name: company.name,
+    address: company.address
 }
+
+res: {
+    data : [
+       {
+        id: 1,
+        name: company.name,
+        address: company.address
+        } 
+    ]
+}
+codeStatusResponse : 200 OK
+
+if fail:
+err.response : 500 error.message
+
 CREATE      --> POST{root.api}/{subdomain}/{version}/company/
 READ        --> GET {root.api}/{subdomain}/{version}/company/
 READById    --> GET {root.api}/{subdomain}/{version}/company/id
@@ -168,7 +183,7 @@ UPDATE      --> GET{root.api}/{subdomain}/{version}/company/update/id
                 POST{root.api}/{subdomain}/{version}/company/update/id
 DELETE      --> GET{root.api}/{subdomain}/{version}/company/delete/id
 
-[3] contact
+[4] contact
 {root.api}/{subdomain}/{version}/company/
 CRUD
 req: {
@@ -178,6 +193,23 @@ req: {
     email: "employee@company.com",
     type: [enum]
 }
+
+res: {
+    data: [
+        {
+            id: 1,
+            company_id: 1,
+            name: " ",
+            gender: [enum],
+            email: "employee@company.com",
+            type: [enum]
+        }
+    ]
+}
+codeStatusResponse : 200 OK
+
+if fail:
+err.response : 500 error.message
 
 CREATE          --> POST{root.api}/{subdomain}/{version}/contact/
 READ            --> GET {root.api}/{subdomain}/{version}/contact/
@@ -204,8 +236,14 @@ req: {
             gender: [enum],
             email: "employee@company.com",
             type: [enum],
-            
         }
     ]
-    
 }
+
+codeStatusResponse : 200 OK
+
+if fail:
+err.response : 500 error.message
+
+
+

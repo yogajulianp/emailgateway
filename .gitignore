@@ -106,6 +106,7 @@ web_modules/
 # Next.js build output
 .next
 out
+.note.txt
 
 # Nuxt.js build / generate output
 .nuxt
