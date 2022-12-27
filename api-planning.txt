@@ -1,0 +1,188 @@
+Planing API
+
+{root.api}/{subdomain}/{version}/{groupping}/{endpoint}
+
+SAMPLE:
+http://rapidcarreer.com/{subdomain}
+
+subdomain: 
+emailgateway/v1/auth/login
+
+http://rapidcarreer.com/emailgateway/v1/auth/login
+
+Status response
+200 - OK                        - 
+201 - CREATE                    
+400 - BAD REQUEST
+401 - UNAUTHORIZED
+403 - FORBIDDEN
+404 - NOT FOUND
+500 - INTERNAL SERVER ERROR
+502 - BAD GATEWAY
+
+GROUP : Authentication
+
+before:
+
+[1] home
+{root.api}/
+
+[2] - login authorize with microsoft acount
+{root.api}/authorize
+
+[3] - login loginComplete
+{root.api}/logincomplete
+
+[4] - refresh_token
+{root.api}/refreshtokens
+
+[5] - logout
+{root.api}/logout
+
+revisi:
+[1] home login
+{root.api}/{subdomain}/{version}/
+
+res:
+{
+    title: "home login",
+    url: " https://login.microsoftonline.com/common/oauth2/v2.0/authorize+....   "
+}
+
+
+
+[2] - login authorize with microsoft acount
+{root.api}/{subdomain}/{version}/authorize
+
+req :
+{
+    code = "...query"
+}
+
+res:
+{
+    "Retrieved auth code in /authorize: " + code
+}
+if success
+redirect : {root.api}/{subdomain}/{version}/dashboard
+
+if fail:
+err-response : 400-input yang dimasukkan tidak valid
+redirect : {root.api}/{subdomain}/{version}/
+
+[3] - 
+
+[4] -
+
+[5] - logout 
+{root.api}/{subdomain}/{version}/logout
+res: 
+{root.api}/{subdomain}/{version}/
+
+
+GROUP : Mailbox
+before
+[1] mailbox 
+{root.api}/home
+
+revisi : 
+[1] dashboard
+{root.api}/{subdomain}/{version}/dashboard
+req: {
+    username,
+    mailbox_history: {
+        body.email - status send
+    }
+    mailbox_contact: {
+        name,
+        company,
+        emailAddress
+    }
+}
+
+res : {
+    username,
+    mailbox_history: {
+        body.email - status send
+    }
+    mailbox_contact: {
+        name,
+        company,
+        emailAddress
+    }
+}
+
+err response : 404 - NOT FOUND
+
+[2] Send Email 
+{root.api}/{subdomain}/{version}/send-email
+
+Button send-email
+req:{
+    to: {
+        contact.email,
+        company_category : {
+            email1,
+            email2,
+            email2,
+        }
+    },
+    cc: {
+        contact.email,
+        company_category : {
+            email1,
+            email2,
+            email2,
+        }
+    },
+    Subject: ".. ",
+    Body: "...",
+    Schedule: {
+        date = "yyyy-MM-dd", 
+        time = "HH:mm:ss"    
+    }
+}
+res: {
+    ("{root.api}/{subdomain}/{version}/dashboard",
+    { 
+        msg: "Email sent",
+        info: info.response,
+    }),
+
+}
+err.response : 500 error.message
+
+[2] company
+{root.api}/{subdomain}/{version}/company/
+
+req: {
+    name: " ",
+    address: " "
+}
+CREATE      --> POST{root.api}/{subdomain}/{version}/company/
+READ        --> GET {root.api}/{subdomain}/{version}/company/
+READById    --> GET {root.api}/{subdomain}/{version}/company/id
+UPDATE      --> GET{root.api}/{subdomain}/{version}/company/update/id
+                POST{root.api}/{subdomain}/{version}/company/update/id
+DELETE      --> GET{root.api}/{subdomain}/{version}/company/delete/id
+
+[3] contact
+{root.api}/{subdomain}/{version}/company/
+CRUD
+req: {
+    company_id: 1,
+    name: " ",
+    gender: [enum],
+    email: "employee@company.com",
+    type: [enum]
+}
+
+CREATE          --> POST{root.api}/{subdomain}/{version}/contact/
+READ            --> GET {root.api}/{subdomain}/{version}/contact/
+READById        --> GET {root.api}/{subdomain}/{version}/contact/id
+ReadByCompany   --> GET {root.api}/{subdomain}/{version}/contact/company/company_id
+UPDATE          --> GET{root.api}/{subdomain}/{version}/contact/update/id
+                    POST{root.api}/{subdomain}/{version}/contact/update/id
+DELETE          --> GET{root.api}/{subdomain}/{version}/contact/delete/id
+
+
