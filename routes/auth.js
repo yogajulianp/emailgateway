@@ -25,6 +25,7 @@ router.get("/authorize", function (req, res) {
   }
 });
 
+
 function tokenReceived(req, res, error, token) {
   if (error) {
     console.log("ERROR getting token:" + error);

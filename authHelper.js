@@ -1,6 +1,7 @@
 var clientId = process.env.CLIENT_ID;
 var clientSecret = process.env.CLIENT_SECRET;
 var redirectUri = "http://localhost:3000/authorize";
+var tenantId = process.env.TENANT_ID;
 
 var scopes = [
   "openid",
@@ -12,7 +13,7 @@ var scopes = [
 var credentials = {
   clientID: clientId,
   clientSecret: clientSecret,
-  site: "https://login.microsoftonline.com/common",
+  site: "https://login.microsoftonline.com/" + tenantId,
   authorizationPath: "/oauth2/v2.0/authorize",
   tokenPath: "/oauth2/v2.0/token",
 };

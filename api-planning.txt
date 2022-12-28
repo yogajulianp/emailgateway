@@ -42,9 +42,8 @@ before:
 
 
 revisi:
-[1] home login -> yoga follow up
+[1] home login 
 {root.api}/{subdomain}/{version}/
-
 res: 
 {
     title: "home login",
@@ -52,10 +51,8 @@ res:
 }
 codeStatusResponse : 200 OK
 
-
 [2] - login authorize with microsoft acount
 {root.api}/{subdomain}/{version}/authorize
-
 req :
 {
     code = "...query"
@@ -74,12 +71,13 @@ if fail:
 err-response : 400-input yang dimasukkan tidak valid
 redirect : {root.api}/{subdomain}/{version}/
 
-
 [3] - logout 
 {root.api}/{subdomain}/{version}/logout
 res: 
 codeStatusResponse : 200 OK
 {root.api}/{subdomain}/{version}/
+
+
 
 
 GROUP : Mailbox
