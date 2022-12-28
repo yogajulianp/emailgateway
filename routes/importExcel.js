@@ -105,13 +105,24 @@ const upload = multer({ storage: storage });
 //! Routes start
 //route for Home page
 /* GET home page. */
-router.get("/homeImport", function (req, res, next) {
+router.get("/homeimport", function (req, res, next) {
     res.render("import", { title: "Import" });
 });
 
 router.post('/import', upload.single("uploadfile"), function (req, res, next) {
-    importExcelCompany("." + '/public/excel/' + req.file.filename);
-    importExcelContact("." + '/public/excel/' + req.file.filename);
+    var string = ("." + '/public/excel/' + req.file.filename);
+    importExcelCompany(string);
+    importExcelContact(string);
+
+    // importExcelCompany(string).then((company) => {
+    //     console.log(company);
+    //     return importExcelContact(string)
+    // }).then((responContact) => {
+    //     console.log(responContact);
+    // }).catch((err) => {
+    //     console.log(err)
+    // })
+
     // var string = ("." + '/public/excel/' + req.file.filename);
     // res.redirect("import/done?valid="+ string);
 });
@@ -124,78 +135,169 @@ router.get('/import/done', function (req, res, next) {
     })
 });
 
-function importExcelCompany(filePath) {
-    readXlsxFile(filePath).then((rows) => {
-        console.log(rows);
-        rows.shift();
-        for (let index = 0; index < rows.length; ++index) {
-            const element = rows[index];
-            Company.findOne({ where: { name: element[5] } })
-            .then(data => {
-                if (data) {
-                    console.log("Company Sudah Terdaftar: " + data.name)
-                } else {
-                    var payload = {
-                        name: element[5],
-                        address: element[6]
-                    }
-                    //Insert the contact
-                    Company.create(payload)
+var importExcelCompany = async function (filePath) {
+    return new Promise(function (resolve, reject) {
+        readXlsxFile(filePath).then((rows) => {
+            console.log(rows);
+            rows.shift();
+            for (let index = 0; index < rows.length; ++index) {
+                const element = rows[index];
+                Company.findOne({ where: { name: element[5] } })
                     .then(data => {
-                        console.log("Berhasil Didaftarkan")
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    });
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            });
-        }
-    })
-}
-
-function importExcelContact(filePath) {
-    readXlsxFile(filePath).then((rows) => {
-        console.log(rows);
-        rows.shift();
-        for (let index = 0; index < rows.length; ++index) {
-            const element = rows[index];
-            Company.findOne({ where: { name: element[5] } })
-            .then(data => {
-                //Check if email is already
-                Contact.findOne({ where: { email: element[3] } })
-                    .then(dataContact => {
-                        if (dataContact) {
-                            console.log("Email Sudah Terdaftar: " + dataContact.email)
+                        if (data) {
+                            console.log("Company Sudah Terdaftar: " + data.name)
                         } else {
                             var payload = {
-                                id_company: data.id,
-                                name: element[1],
-                                gender: element[2],
-                                email: element[3],
-                                type: element[4]
+                                name: element[5],
+                                address: element[6]
                             }
                             //Insert the contact
-                            Contact.create(payload)
-                            .then(data => {
-                                console.log("Berhasil Didaftarkan")
-                            })
-                            .catch(err => {
-                                console.log(err)
-                            });
+                            Company.create(payload)
+                                .then(data => {
+                                    console.log("Berhasil Didaftarkan")
+                                    resolve("Company Save")
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    reject("Company Failed to Save")
+                                });
                         }
                     })
                     .catch(err => {
                         console.log(err)
                     });
-            })
-            .catch(err => {
-                console.log(err)
-            });
-        }
-    })
+            }
+        })
+    });
+}
+
+var importExcelContact = async function (filePath) {
+    return new Promise(function (resolve, reject) {
+        readXlsxFile(filePath).then((rows) => {
+            console.log(rows);
+            rows.shift();
+            for (let index = 0; index < rows.length; ++index) {
+                const element = rows[index];
+                Company.findOne({ where: { name: element[5] } })
+                    .then(data => {
+                        //Check if email is already
+                        Contact.findOne({ where: { email: element[3] } })
+                            .then(dataContact => {
+                                if (dataContact) {
+                                    console.log("Email Sudah Terdaftar: " + dataContact.email)
+                                } else {
+                                    var payload = {
+                                        id_company: data.id,
+                                        name: element[1],
+                                        gender: element[2],
+                                        email: element[3],
+                                        type: element[4]
+                                    }
+                                    //Insert the contact
+                                    Contact.create(payload)
+                                        .then(data => {
+                                            console.log("Berhasil Didaftarkan")
+                                            resolve("Contact Save")
+                                        })
+                                        .catch(err => {
+                                            console.log(err)
+                                            reject("Contact Failed to Save")
+                                        });
+                                }
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            });
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    });
+            }
+        })
+    });
 }
 
 module.exports = router;
+
+/* Contoh Kalau Pakai JSON
+
+http://localhost:3000/contact/uploadfile
+{
+    "company": [
+        {
+            "name": "Company A",
+            "address": "Aceh"
+        },
+        {
+            "name": "Company B",
+            "address": "Bogor"
+        },
+        {
+            "name": "Company C",
+            "address": "Cikampek"
+        },
+        {
+            "name": "Company D",
+            "address": "DIY"
+        }
+    ],
+    "contact": [
+        {
+            "companyName": "Company A",
+            "name": "A addyani",
+            "gender": "default",
+            "email": "Aemployee@company.com",
+            "type": "recipient"
+        },
+                {
+            "companyName": "Company B",
+            "name": "B addyani",
+            "gender": "default",
+            "email": "Bemployee@company.com",
+            "type": "recipient"
+        },
+                {
+            "companyName": "Company C",
+            "name": "C addyani",
+            "gender": "default",
+            "email": "Cemployee@company.com",
+            "type": "recipient"
+        },
+                {
+            "companyName": "Company D",
+            "name": "D addyani",
+            "gender": "default",
+            "email": "Demployee@company.com",
+            "type": "recipient"
+        },
+                {
+            "companyName": "Company A",
+            "name": "AA addyani",
+            "gender": "male",
+            "email": "AAemployee@company.com",
+            "type": "cc"
+        },
+                {
+            "companyName": "Company B",
+            "name": "BB addyani",
+            "gender": "male",
+            "email": "BBemployee@company.com",
+            "type": "cc"
+        },
+                {
+            "companyName": "Company C",
+            "name": "CC addyani",
+            "gender": "female",
+            "email": "CCemployee@company.com",
+            "type": "cc"
+        },
+                {
+            "companyName": "Company D",
+            "name": "DD addyani",
+            "gender": "female",
+            "email": "DDemployee@company.com",
+            "type": "cc"
+        }
+    ]
+}
+*/
