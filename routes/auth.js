@@ -51,6 +51,7 @@ router.get("/logincomplete", function (req, res) {
   }
 
   res.send(pages.loginCompletePage(email));
+  
 });
 
 router.get("/refreshtokens", function (req, res) {
