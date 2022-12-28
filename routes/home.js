@@ -25,7 +25,7 @@ router.post("/send", async (req, res) => {
 
   // send mail with defined transport object
   let options = {
-    from: `"Rapid Tech EmailManagementSystem" <Yoga.Prasutiyo@rapidtech.id>`, // sender address
+    from: `"Rapid Tech EmailManagementSystem" <${req.session.email}>`, // sender address
     to: req.body.email, // list of receivers
     subject: req.body.subject, // Subject line
     text: "Test mail", // plain text body
