@@ -189,4 +189,5 @@ dist
 
 /package-lock.json
 /test/*
+/node-node_modules
 
