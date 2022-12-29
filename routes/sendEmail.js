@@ -4,7 +4,7 @@ var nodemailer = require("nodemailer");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("home", { title: "Home", email: req.session.email });
+  res.render("sendEmail", { title: "Send Email", email: req.session.email });
 });
 
 router.post("/send", async (req, res) => {
@@ -25,7 +25,7 @@ router.post("/send", async (req, res) => {
 
   // send mail with defined transport object
   let options = {
-    from: `"Rapid Tech Boongan" <buyung.fajrin@rapidtech.id>`, // sender address
+    from: `"Rapid Tech EmailManagementSystem" <${req.session.email}>`, // sender address
     to: req.body.email, // list of receivers
     subject: req.body.subject, // Subject line
     text: "Test mail", // plain text body
@@ -38,7 +38,7 @@ router.post("/send", async (req, res) => {
       return;
     }
 
-    console.log("Sent: " + info.response);
+    console.log("Sent: " + info.responseText);
     res.json({
       msg: "Email sent",
       info: info.response,
