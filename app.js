@@ -8,7 +8,7 @@ var session = require("express-session");
 
 var authRouter = require("./routes/auth");
 var usersRouter = require("./routes/users");
-var homeRouter = require("./routes/home");
+var emailRouter = require("./routes/sendEmail");
 
 var app = express();
 
@@ -40,7 +40,7 @@ db.sequelize
   });
 
 app.use("/", authRouter);
-app.use("/home", homeRouter);
+app.use("/send-email", emailRouter);
 app.use("/users", usersRouter);
 
 // catch 404 and forward to error handler

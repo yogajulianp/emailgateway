@@ -4,7 +4,7 @@ var nodemailer = require("nodemailer");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("home", { title: "Home", email: req.session.email });
+  res.render("sendEmail", { title: "Send Email", email: req.session.email });
 });
 
 router.post("/send", async (req, res) => {
