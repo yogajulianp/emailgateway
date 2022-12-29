@@ -5,9 +5,11 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 require("dotenv").config();
 var session = require("express-session");
+const bodyparser = require('body-parser')
 
 var authRouter = require("./routes/auth");
 var usersRouter = require("./routes/users");
+var importRouter = require("./routes/importExcel");
 var emailRouter = require("./routes/sendEmail");
 
 var app = express();
@@ -29,6 +31,14 @@ app.use(
   })
 );
 
+//use express static folder
+app.use(express.static("./public"))
+// body-parser middleware use
+app.use(bodyparser.json())
+app.use(bodyparser.urlencoded({
+    extended: true
+}))
+
 const db = require("./models");
 db.sequelize
   .sync()
@@ -42,6 +52,7 @@ db.sequelize
 app.use("/", authRouter);
 app.use("/send-email", emailRouter);
 app.use("/users", usersRouter);
+app.use("/contact", importRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
