@@ -127,12 +127,15 @@ router.post('/import', upload.single("uploadfile"), function (req, res, next) {
     // res.redirect("import/done?valid="+ string);
 });
 
-router.get('/import/done', function (req, res, next) {
-    var passedVariable = req.query.valid;
-    importExcelContact(passedVariable);
-    res.json({
-        info: "Import completed"
-    })
+router.get('/import/done', upload.single("uploadfile"), function (req, res, next) {
+    //var passedVariable = req.query.valid;
+
+    var string = ("." + '/public/excel/' + req.file.filename);
+    importExcelContact(string);
+    res.redirect("/");
+    // res.json({
+    //     info: "Import completed"
+    // })
 });
 
 var importExcelCompany = async function (filePath) {
