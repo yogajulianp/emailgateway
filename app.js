@@ -9,8 +9,8 @@ const bodyparser = require('body-parser')
 
 var authRouter = require("./routes/auth");
 var usersRouter = require("./routes/users");
-var homeRouter = require("./routes/home");
 var importRouter = require("./routes/importExcel");
+var emailRouter = require("./routes/sendEmail");
 
 var app = express();
 
@@ -50,7 +50,7 @@ db.sequelize
   });
 
 app.use("/", authRouter);
-app.use("/home", homeRouter);
+app.use("/send-email", emailRouter);
 app.use("/users", usersRouter);
 app.use("/contact", importRouter);
 
