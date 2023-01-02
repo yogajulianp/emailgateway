@@ -37,7 +37,7 @@ app.use(express.static("./public"))
 // body-parser middleware use
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({
-  extended: true
+    extended: true
 }))
 
 const db = require("./models");
