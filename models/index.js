@@ -25,4 +25,8 @@ db.sequelize = sequelize;
 db.company = require("./company")(sequelize, Sequelize);
 db.contact = require("./contact")(sequelize, Sequelize);
 db.mailbox = require("./mailbox")(sequelize, Sequelize);
+
+db.company.hasMany(db.contact, {foreignKey: 'id_company'})
+db.contact.belongsTo(db.company, {foreignKey: 'id_company'})
+
 module.exports = db;
