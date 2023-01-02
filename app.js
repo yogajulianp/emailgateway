@@ -12,6 +12,8 @@ var usersRouter = require("./routes/users");
 var importRouter = require("./routes/importExcel");
 var emailRouter = require("./routes/sendEmail");
 var companyRouter = require("./routes/company");
+var contactRouter = require("./routes/contact");
+
 
 var app = express();
 
@@ -55,6 +57,7 @@ app.use("/send-email", emailRouter);
 app.use("/users", usersRouter);
 app.use("/contact", importRouter);
 app.use("/company-data", companyRouter);
+app.use("/contact", contactRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
