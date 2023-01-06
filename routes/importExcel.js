@@ -38,21 +38,57 @@ router.post('/import', upload.single("uploadfileExcel"), function (req, res, nex
     })
 });
 
+function arrayToJSONObject(arr) {
+    //header
+    arrShift = arr.shift();
+    // console.log("Sebelum Shift=> ", arr);
+    // console.log("Setelah Shift=> ", arrShift);
+
+    var keys = arrShift;
+    // console.log("Head Table keys=> ", keys);
+
+    //vacate keys from main array
+    var newArr = arr.slice(0, arr.length);
+
+    var formatted = [],
+        data = newArr,
+        cols = keys,
+        l = cols.length;
+    for (var i = 0; i < data.length; i++) {
+        var d = data[i],
+            o = {};
+        for (var j = 0; j < l; j++)
+            o[cols[j]] = d[j];
+        formatted.push(o);
+    }
+    return formatted;
+}
+
+function uniqueObject(object, keyObject) {
+    const key = keyObject;
+    const unique = [...new Map(object.map(item =>
+        [item[key], item])).values()];
+
+    return unique;
+}
+
 var importExcelCompany = async function (filePath) {
     return new Promise(function (resolve, reject) {
         readXlsxFile(filePath).then((rows) => {
-            console.log(rows);
-            rows.shift();
-            for (let index = 0; index < rows.length; ++index) {
-                const element = rows[index];
-                Company.findOne({ where: { name: element[5] } })
+            let rowsObject = arrayToJSONObject(rows)
+            // console.log("Data Filter Finish=> ", rowsObject);
+            let unique = uniqueObject(rowsObject, 'company')
+            console.log("Data Uniq=> ", unique);
+
+            unique.forEach((element, index) => {
+                Company.findOne({ where: { name: element.company } })
                     .then(data => {
                         if (data) {
-                            console.log("Company Sudah Terdaftar: " + data.name)
+                            console.log("Company Sudah Terdaftar: " + data.company)
                         } else {
                             var payload = {
-                                name: element[5],
-                                address: element[6]
+                                name: element.company,
+                                address: element.address
                             }
                             //Insert the contact
                             Company.create(payload)
@@ -68,8 +104,9 @@ var importExcelCompany = async function (filePath) {
                     })
                     .catch(err => {
                         console.log(err)
+                        reject("Server Error")
                     });
-            }
+            })
         })
     });
 }
@@ -77,24 +114,26 @@ var importExcelCompany = async function (filePath) {
 var importExcelContact = async function (filePath) {
     return new Promise(function (resolve, reject) {
         readXlsxFile(filePath).then((rows) => {
-            console.log(rows);
-            rows.shift();
-            for (let index = 0; index < rows.length; ++index) {
-                const element = rows[index];
-                Company.findOne({ where: { name: element[5] } })
+            let rowsObject = arrayToJSONObject(rows)
+            // console.log("Data Filter Finish=> ", rowsObject);
+            let unique = uniqueObject(rowsObject, 'email')
+            console.log("Data Uniq=> ", unique);
+
+            unique.forEach((element, index) => {
+                Company.findOne({ where: { name: element.company } })
                     .then(data => {
                         //Check if email is already
-                        Contact.findOne({ where: { email: element[3] } })
+                        Contact.findOne({ where: { email: element.email } })
                             .then(dataContact => {
                                 if (dataContact) {
                                     console.log("Email Sudah Terdaftar: " + dataContact.email)
                                 } else {
                                     var payload = {
                                         id_company: data.id,
-                                        name: element[1],
-                                        gender: element[2],
-                                        email: element[3],
-                                        type: element[4]
+                                        name: element.name,
+                                        gender: element.gender,
+                                        email: element.email,
+                                        type: element.type
                                     }
                                     //Insert the contact
                                     Contact.create(payload)
@@ -115,13 +154,241 @@ var importExcelContact = async function (filePath) {
                     .catch(err => {
                         console.log(err)
                     });
-            }
+            })
         })
     });
 }
 
 module.exports = router;
 
+/*
+router.get("/contact", function (req, res, next) {
+    Contact.findAll()
+    .then(data => {
+        res.json({
+            data: data
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.get("/contact/company/:id", function (req, res, next) {
+    var id = parseInt(req.params.id);
+    Contact.findAll({ where: { id_company: id } })
+    .then(data => {
+        res.json({
+            data: data
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.get("/contact/:id", function (req, res, next) {
+    var id = parseInt(req.params.id);
+    Contact.findByPk(id)
+    .then(data => {
+        res.json({
+            data: data
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.post("/contact", function (req, res, next) {
+    var contact = {
+		name: req.body.name,
+        email: req.body.email,
+        gender: req.body.gender,
+        type: req.body.type,
+        id_company: req.body.company_id
+	}
+	Contact.create(contact)
+    .then(data => {
+        res.json({
+            data: data
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.get("/contact/update/:id", function (req, res, next) {
+    var id = parseInt(req.params.id);
+    Contact.findByPk(id)
+    .then(data => {
+        res.json({
+            data: data,
+            info: "Redirect To Halaman Updates"
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.post("/contact/update/:id", function (req, res, next) {
+    const id = req.params.id;
+    var contact = {
+		name: req.body.name,
+        email: req.body.email,
+        gender: req.body.gender,
+        type: req.body.type,
+        id_company: req.body.company_id
+	}
+	Contact.update(contact, {
+		where: {id: id}
+	})
+    .then(data => {
+        res.json({
+            info: "berhasil di update",
+            data: contact
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.get("/contact/delete/:id", function (req, res, next) {
+    const id = req.params.id;
+	Contact.destroy({
+		where: {id: id}
+	})
+    .then(data => {
+        res.json({
+            info: "berhasil di delete"
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+*/
+
+/*
+router.get("/company", function (req, res, next) {
+    Company.findAll()
+    .then(data => {
+        res.json({
+            data: data
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.get("/company/:id", function (req, res, next) {
+    var id = parseInt(req.params.id);
+    Company.findByPk(id)
+    .then(data => {
+        res.json({
+            data: data
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.post("/company", function (req, res, next) {
+    var company = {
+		name: req.body.name,
+        address: req.body.address
+	}
+	Company.create(company)
+    .then(data => {
+        res.json({
+            data: data
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.get("/company/update/:id", function (req, res, next) {
+    var id = parseInt(req.params.id);
+    Company.findByPk(id)
+    .then(data => {
+        res.json({
+            data: data,
+            info: "Redirect To Halaman Updates"
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.post("/company/update/:id", function (req, res, next) {
+    const id = req.params.id;
+    var company = {
+		name: req.body.name,
+        address: req.body.address
+	}
+	Company.update(company, {
+		where: {id: id}
+	})
+    .then(data => {
+        res.json({
+            info: "berhasil di update",
+            data: company
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
+router.get("/company/delete/:id", function (req, res, next) {
+    const id = req.params.id;
+	Company.destroy({
+		where: {id: id}
+	})
+    .then(data => {
+        res.json({
+            info: "berhasil di delete"
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+*/
 
 /*
 //Untuk Menampilkan Website Import Excel
