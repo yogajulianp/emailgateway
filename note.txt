@@ -10,7 +10,6 @@
     }
 [5] import excel -> Addyani
 
-
 //authorize login
 
 https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize?redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauthorize&scope=openid%20profile%20offline_access%20https%3A%2F%2Foutlook.office.com%2Fcalendars.readwrite&response_type=code&client_id=f8e94e61-6043-44cc-8880-cf6f013a3876&sso_reload=true
@@ -24,3 +23,42 @@ ERROR getting token:[object Object]
 
 GET /authorize?code=0.AT4AfoFxnGPYkUOQj74mrk7w6WFO6fhDYMxEiIDPbwE6OHY-AAA.AgABAAIAAAD--DLA3VO7QrddgJg7WevrAgDs_wQA9P8KTO4GfSrm8-9L5Nzw9pEgMexpKoozlTt6qX57QThML-DthohyHa35_bC7DbO8zx6syuXuoPEwu99bjF9nHZYW802CotMu8vPwDQYcXBz7nUopPo7Di-Ebc-f8YMEYWQjsRyK9vkz1Sn0oaWNniEpMX_TBlP4NJ92nxMa8XT16tDFKhGWC7ZLhId9iSQn1CL3PXKX-Mbo_OjBFWWAbjhxW1ysLGmSZ3G0mNO0flT4y5824I1D2xA5Xa4EarMGws9bPk15Ex2LNWkrx8MQSs97Dm82pQqdQKKOzwUxJkoukdSlkzqVvVmaAnV5_IY-TmJKGucKYd3qh3mEVEY1zs1rubY37c7WAPlzP919hvUV2JTyWJpF9zP1rUyt8a3Y-3NNrv31yIeigvfOsCIGjm4uk29jJhihSIGE9BuZdhqPFmw71U2Ogo2_mx-ce4pzbRJgoMRK2chDytapg7YcTptlE-GNGk5pSm12pzjv17gpkeMdS3A37XozAhUhA-wVRk7T3CE40hlWupNi3y6p5sVFW7otGw6Vw9fcPxQmMXv-1btz9Vc5MDodAPQysAPO0y-H1PsJ0jTuB81uo4Ogo6oL1pBwjSzgTW8Dh7saQuzmmUN70h9eZJDtCFfm0BIb4rh2s9GN_MWUM9r0of_B_Rp1tpTVegBsDDkIlNqlbNcu25-n5xd-m-Qby9aEF7usvYvtR-QW0GGr8QVHifA8ovOGxWA60HDJeFGgJNcKS50AnxaPWMdNDskkuPYiS9g&session_state=d78aaf66-2509-4cf3-827f-5e5eb631d526 200 281.728 ms - 36
 
+//Testing Send Email
+yahaha6677@gmail.com Diganti Ke Email Masing-masing
+{
+    "to": {
+        "individualEmail": "yahaha6677@gmail.com",
+        "groupEmail" : [
+          {
+            "email1": "yahaha6677@gmail.com",
+            "email2": "yahaha6677@gmail.com",
+            "email3": "yahaha6677@gmail.com",
+            "email4": "yahaha6677@gmail.com",
+            "email5": "yahaha6677@gmail.com",
+            "email6": "yahaha6677@gmail.com",
+            "email7": "yahaha6677@gmail.com",
+            "email8": "yahaha6677@gmail.com",
+            "email9": "yahaha6677@gmail.com",
+            "email10": "yahaha6677@gmail.com"
+          }
+        ]
+    },
+    "cc": {
+        "individualEmail": "yahaha6677@gmail.com",
+        "groupEmail" : [
+          {
+            "email1": "yahaha6677@gmail.com",
+            "email2": "yahaha6677@gmail.com",
+            "email3": "yahaha6677@gmail.com",
+            "email4": "yahaha6677@gmail.com",
+            "email5": "yahaha6677@gmail.com"
+          }
+        ]
+    },
+    "Subject": "Testing Subject",
+    "Body": "MMy Body Massage",
+    "Schedule": {
+        "date" : "2023-01-06", 
+        "time" : "20:01:01"    
+    }
+}
