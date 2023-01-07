@@ -75,15 +75,13 @@ router.post('/send', (req, res) => {
     }
 
     let dataFiles = req.files
-    //console.info("Files: " + dataFiles.length)
-
     simpleArray = [];
     simpleArray2 = dataFiles;
     let attachmentsArrays = arrayAttach(dataFiles)
-    //console.log("!!!!!!!!!!!!!!!!!Attachments: " + attachmentsArrays)
 
     function arrayAttach() {
       let localArray = this.simpleArray;
+
       this.simpleArray2.forEach((element, index) => {
         let filePath = element.destination + "/" + element.filename
         let splitFileName = element.filename.split("-")
@@ -104,89 +102,31 @@ router.post('/send', (req, res) => {
 
         localArray.push(dataArray)
       });
-      //console.log("Data Array:", localArray);
       return localArray;
     }
 
     let dataDetail = req.body.data
     const objDataDetail = JSON.parse(dataDetail);
-    //console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! objDataDetail:", objDataDetail);
 
-    simpleArray = [];
-    simpleArray2 = objDataDetail.to;
-    let attachmentsArraysTo = arrayAttachTo(simpleArray2)
-    //console.log("!!!!!!!!!!!!!!!!!Attachments: " + attachmentsArrays)
+    simpleArrayNew = [];
+    simpleArrayNew2 = objDataDetail.to;
+    let attachmentsArraysTo = arrayAttachTo(simpleArrayNew2)
+    // console.log("----------------------------------------------------------------")
+    // console.log("attachmentsArraysTo: ",attachmentsArraysTo)
+    // console.log("----------------------------------------------------------------")
 
     function arrayAttachTo() {
-      let localArray = this.simpleArray;
-      this.simpleArray2.forEach((element, index) => {
+      let localArray = this.simpleArrayNew;
+      this.simpleArrayNew2.forEach((element, index) => {
         let arraySave = []
         arraySave.push(element)
-
-        var dataName = ""
-        var dataGender = ""
-        // Contact.findOne({ where: { email: element.emailAddress.address } })
-        //   .then(data => {
-        //     //console.log("!!!!!!!!!!!!!!!!!  data: " + data.name)
-        //     var gender = "Mr/Mrs"
-        //     if (data.gender === 'male') {
-        //       gender = "Mr"
-        //     } else if (data.gender === 'female') {
-        //       gender = "Mrs"
-        //     }
-        //     this.dataName = data.name;
-        //     this.dataGender = data.gender;
-        //   })
-        //   .catch(err => {
-        //     console.log(err)
-        //   });
-
-        const getDbVersionConfigAsync = async () => {
-          return Contact.findOne({ where: { email: element.emailAddress.address } })
-        }
-
-        genderBuffer = ""
-        nameBuffer = ""
-        getDbVersionConfigAsync()
-          .then(data => {
-            
-            var gender = "Mr/Mrs"
-            if (data.gender === 'male') {
-              gender = "Mr"
-            } else if (data.gender === 'female') {
-              gender = "Mrs"
-            }
-            this.genderBuffer = gender
-            this.nameBuffer = data.name
-            console.log("!!!!!!!!!!!!!!!!!  data: " + data.name + " - gender: " + gender)
-
-            // let dataArray = {
-            //   subject: objDataDetail.subject,
-            //   body: {
-            //     contentType: "HTML",
-            //     content: `
-            //     <p> Hello ${gender} , ${data.name} </p>
-            //     <p>${objDataDetail.body}</p>
-              
-            //     <p>from Rapidtech with ❤️</p>
-            //     `
-            //   },
-            //   toRecipients: arraySave,
-            //   ccRecipients: objDataDetail.cc,
-            //   attachments: attachmentsArrays
-            // }
-
-            // localArray.push(dataArray)
-          })
-
-        console.log("!!!!!!!!!!!!!!!!!  Buffer: " + nameBuffer + " - "+ genderBuffer)
 
         let dataArray = {
           subject: objDataDetail.subject,
           body: {
             contentType: "HTML",
             content: `
-              <p> Hello ${genderBuffer} , ${nameBuffer} </p>
+              <p> Hello, name </p>
               <p>${objDataDetail.body}</p>
 
               <p>from Rapidtech with ❤️</p>
@@ -199,11 +139,10 @@ router.post('/send', (req, res) => {
 
         localArray.push(dataArray)
       });
-      //console.log("Data Array:", localArray);
       return localArray;
     }
 
-    let message = simpleArray
+    let message = simpleArrayNew
     message.forEach((element, index) => {
       const message = createEmailAsJson(element);
       const options = {

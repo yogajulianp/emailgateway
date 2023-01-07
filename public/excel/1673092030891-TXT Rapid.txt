@@ -1,0 +1,61 @@
+
+DB_NAME='EmailGatewayDB'
+DB_USER='yoga'
+DB_PASSWORD='1234'
+
+CLIENT_ID="f8e94e61-6043-44cc-8880-cf6f013a3876"
+CLIENT_SECRET="EEy8Q~DarJZeNpmcahflmQtfOKUwu0r6_7Y5laJ9"
+
+// req.body.company.forEach((company, index) => {
+    //     //console.log('Index: ' + index + ' Value: ' + company.name);
+
+    //     //Check if company is already
+    //     Company.findOne({ where: { name: company.name } })
+    //         .then(data => {
+    //             if (data) {
+    //                 console.log("Company Sudah Terdaftar: " + company.name)
+    //             } else {
+    //                 var companyS = {
+    //                     name: company.name,
+    //                     address: company.address
+    //                 }
+    //                 //Insert company
+    //                 Company.create(companyS)
+    //             }
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //         });
+    // });
+
+    // req.body.contact.forEach((contact, index) => {
+    //     console.log('Index: ' + index + ' Value: ' + contact.name);
+
+    //     //Check company for search id company
+    //     Company.findOne({ where: { name: contact.companyName } })
+    //         .then(data => {
+    //             //Check if email is already
+    //             Contact.findOne({ where: { email: contact.email } })
+    //                 .then(dataContact => {
+    //                     if (dataContact) {
+    //                         console.log("Email Sudah Terdaftar: " + contact.email)
+    //                     } else {
+    //                         var contactS = {
+    //                             id_company: data.id,
+    //                             name: contact.name,
+    //                             gender: contact.gender,
+    //                             email: contact.email,
+    //                             type: contact.type
+    //                         }
+    //                         //Insert the contact
+    //                         Contact.create(contactS)
+    //                     }
+    //                 })
+    //                 .catch(err => {
+    //                     console.log(err)
+    //                 });
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //         });
+    // });
