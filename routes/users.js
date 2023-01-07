@@ -6,6 +6,7 @@ const fs = require('fs');
 const request = require('request');
 const db = require('../models');
 const Contact = db.contact;
+const Mailbox = db.mailbox;
 
 require("dotenv").config();
 
@@ -54,7 +55,7 @@ const multi_upload = multer({
     //       return cb(err);
     //   }
   },
-}).array('uploadedImages', 5)
+}).array('uploadedFiles', 5)
 
 router.post('/send', (req, res) => {
   multi_upload(req, res, function (err) {
@@ -77,7 +78,7 @@ router.post('/send', (req, res) => {
     let dataFiles = req.files
     simpleArray = [];
     simpleArray2 = dataFiles;
-    let attachmentsArrays = arrayAttach(dataFiles)
+    let attachmentsArrays = arrayAttach()
 
     function arrayAttach() {
       let localArray = this.simpleArray;
@@ -110,23 +111,34 @@ router.post('/send', (req, res) => {
 
     simpleArrayNew = [];
     simpleArrayNew2 = objDataDetail.to;
-    let attachmentsArraysTo = arrayAttachTo(simpleArrayNew2)
-    // console.log("----------------------------------------------------------------")
-    // console.log("attachmentsArraysTo: ",attachmentsArraysTo)
-    // console.log("----------------------------------------------------------------")
+    let attachmentsArraysTo = arrayAttachTo()
 
     function arrayAttachTo() {
       let localArray = this.simpleArrayNew;
-      this.simpleArrayNew2.forEach((element, index) => {
+      this.simpleArrayNew2.forEach(async (element, index) => {
         let arraySave = []
         arraySave.push(element)
+
+        const result = await Contact.findOne({
+          where: {
+            email: element.emailAddress.address
+          }
+        });
+        global.result = result;
+
+        let gender = "Mr/Mrs";
+        if (global.result.gender == "male") {
+          gender = "Mr"
+        } else if (global.result.gender == "female") {
+          gender = "Mrs"
+        };
 
         let dataArray = {
           subject: objDataDetail.subject,
           body: {
             contentType: "HTML",
             content: `
-              <p> Hello, name </p>
+              <p> Hello ${gender}, ${global.result.name} </p>
               <p>${objDataDetail.body}</p>
 
               <p>from Rapidtech with ❤️</p>
@@ -138,27 +150,67 @@ router.post('/send', (req, res) => {
         }
 
         localArray.push(dataArray)
+
+        if (index == objDataDetail.to.length - 1) {
+          let message = localArray
+          message.forEach((element, index) => {
+            const message = createEmailAsJson(element);
+            const options = {
+              url: 'https://graph.microsoft.com/v1.0/me/sendMail',
+              headers: {
+                'Authorization': req.headers.authorization,
+                'Content-Type': 'application/json'
+              },
+              body: message,
+              json: true
+            };
+
+            request.post(options, (error, response, body) => {
+              console.log("Succes Send Email", response.statusCode);
+            });
+
+            if (index == localArray.length - 1) {
+              var dataAttachment = dataFiles.map(item => item.filename).join(',');
+              var dataBody = JSON.stringify(objDataDetail.body)
+              var dataSubject = objDataDetail.subject
+
+              var arrayKosong = [];
+              localArray.forEach((element, index) => {
+                var dataToRecipients = element.toRecipients.map(item => item.emailAddress).reduce((obj, item) => {
+                  return Object.assign(obj, item);
+                }, {});
+                arrayKosong.push(dataToRecipients)
+              });
+              var dataToRecipientsDb = arrayKosong.map(item => item.address).join(',');
+
+              var arrayNewKosong = localArray[0].ccRecipients
+              arrayNewKosong.forEach((element, index) => {
+                var dataCCRecipients = element.emailAddress
+                arrayNewKosong.push(dataCCRecipients)
+              });
+              var dataCCRecipientsDb = arrayNewKosong.map(item => item.address).filter(function (element) {
+                return element !== undefined;
+              });
+              dataCCRecipientsDb = dataCCRecipientsDb.join(',');
+
+              var payload = {
+                subject: dataSubject,
+                attachment: dataAttachment
+              }
+              Mailbox.create(payload)
+                .then(data => {
+                  console.log("Berhasil Ditambahkan")
+                })
+                .catch(err => {
+                  console.log(err)
+                });
+            }
+          });
+        }
       });
       return localArray;
     }
 
-    let message = simpleArrayNew
-    message.forEach((element, index) => {
-      const message = createEmailAsJson(element);
-      const options = {
-        url: 'https://graph.microsoft.com/v1.0/me/sendMail',
-        headers: {
-          'Authorization': req.headers.authorization,
-          'Content-Type': 'application/json'
-        },
-        body: message,
-        json: true
-      };
-
-      request.post(options, (error, response, body) => {
-        console.log(response.statusCode);
-      });
-    });
     res.json({
       info: "Berhasil Dikirim"
     })
@@ -174,21 +226,5 @@ const createEmailAsJson = (messageSend) => {
 
   return messageAsJson;
 };
-
-// async function findContact(elementEmail) {
-
-//   let name = await Contact.findOne({ where: { email: elementEmail} })
-//   .then(data => {
-//     return data.name;
-//   })
-//   .catch(err => {
-//     console.log(err)
-//   })
-
-//   // wait 3 seconds
-//   await new Promise((resolve, reject) => setTimeout(resolve, 3000));
-
-//   return name;
-// }
 
 module.exports = router;
