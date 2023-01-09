@@ -301,6 +301,22 @@ router.get("/company", function (req, res, next) {
 	});
 });
 
+router.get("/company/contact", function (req, res, next) {
+    Company.findAll({
+        include: Contact
+      })
+    .then(data => {
+        res.json({
+            data: data
+        })
+	})
+	.catch(err => {
+        res.json({
+            info: err
+        })
+	});
+});
+
 router.get("/company/:id", function (req, res, next) {
     var id = parseInt(req.params.id);
     Company.findByPk(id)
